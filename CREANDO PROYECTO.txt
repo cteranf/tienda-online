@@ -1,0 +1,9 @@
+ npm install -g npm@latest
+
+npm --version
+
+npm cache clean --force
+
+npm install -g create-react-app
+
+npx create-react-app lunatel
