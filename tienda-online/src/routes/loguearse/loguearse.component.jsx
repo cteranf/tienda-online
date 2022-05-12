@@ -1,8 +1,6 @@
-/*import { useEffect } from 'react';
-import { getRedirectResult } from 'firebase/auth';*/
-import { auth,signInWithGooglePopup,createUserDocumentFromAuth,signInWithGoogleRedirect } from '../../utils/firebase/firebase.utils';
+import RegistrarLoginForm from '../../componentes/registrar-login-form/registrar-login-form.component';
 import LoginForm from '../../componentes/login-form/login-form.component';
-
+import './loguearse.style.scss';
 
  const Loguearse = () => {
  /*  useEffect(() => {
@@ -15,16 +13,12 @@ import LoginForm from '../../componentes/login-form/login-form.component';
     check()
     },[]);
     */
-    const logGoogleUser = async () => {
-        const { user } = await signInWithGooglePopup();
-       const userDocRef = await  createUserDocumentFromAuth(user);
-    }
+    
     
     return(
-        <div>
-            <h1> Pagina de Login</h1>
-            <button onClick={ logGoogleUser }>Logearse popup</button> 
+        <div className='authentication-container'>
             <LoginForm></LoginForm>
+            <RegistrarLoginForm></RegistrarLoginForm>
         </div>
     )
 

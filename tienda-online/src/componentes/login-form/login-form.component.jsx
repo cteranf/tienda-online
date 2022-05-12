@@ -1,39 +1,44 @@
 import { useState } from "react";
 
-import { auth, createAuthUserWithEmailAndPassword,createUserDocumentFromAuth } from "../../utils/firebase/firebase.utils";
+import { auth, createAuthUserWithEmailAndPassword,createUserDocumentFromAuth,signInWithGooglePopup,signInAuthUserWithEmailAndPassword } from "../../utils/firebase/firebase.utils";
 import FormInput from "../form-input/form-input.component";
 import Boton from "../boton/boton.component";
 import './login-form.style.scss';
 const defaultFormFields = {
-    displayName:'',
     email:'',
     password:'',
-    confirmPassword:''
+    
 }
 
 const LoginForm = () => {
     const [formFields, setFormFields] = useState(defaultFormFields);
-    const { displayName, email, password, confirmPassword } = formFields;
-    console.log(formFields);
-
+    const { email, password} = formFields;
+    
     const resetFormFields = () => {
         setFormFields(defaultFormFields);
     }
-
+    const logGoogleUser = async () => {
+        const { user } = await signInWithGooglePopup();
+       await createUserDocumentFromAuth(user);
+    }
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if( password != confirmPassword ){
-            alert("Las contraseñas no coinciden");
-            return ;
-        }
+        
         try{
-            const { user } = await createAuthUserWithEmailAndPassword(email, password);
-            await createUserDocumentFromAuth(user, {displayName});
+            const response = await signInAuthUserWithEmailAndPassword(email, password);
+            console.log(response);
             resetFormFields();
-
         } catch(error){
-            if(error.code == 'auth/email-already-in-use')
-            alert("Usuario ya registrado en la base de datos")
+           switch(error.code){
+               case 'auth/wrong-password':
+                   alert("Contraseña Incorrecta");
+                   break;
+                case 'auth/user-not-found':
+                    alert("Usuario no registrado");
+                    break;
+                default:
+                    console.log(error);
+           }    
         }
     }
 
@@ -43,20 +48,19 @@ const LoginForm = () => {
     };
     return(
         <div className="sing-up-container">
-            <h2>Si no tienes una cuenta ?</h2>
+            <h2>Si tienes una cuenta ?</h2>
             <h1>Ingresar tu contraseña y password</h1>
             <form onSubmit={handleSubmit}>
                 
-                <FormInput label="Display Name" type="text" required onChange={handleChange} name="displayName" value={displayName}></FormInput>
-
+              
                 <FormInput label="Email" name="email" type="email" required onChange={handleChange} value={email}></FormInput>
 
                 <FormInput label="Password" name="password" type="password" required value={password} onChange={handleChange}></FormInput>
 
-                <FormInput label="Confirm Password" name="confirmPassword" type="password" required  onChange={handleChange} value={confirmPassword}></FormInput>
-
-                <Boton type="submit" >Enviar Datos</Boton>
-                
+                <div className="buttons-container">
+                    <Boton type="submit" >Ingresar</Boton>
+                    <Boton type="button" buttonType='google' onClick={logGoogleUser}>Google</Boton>
+                </div>
             </form>
         </div>
     );
